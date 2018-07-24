@@ -1,16 +1,22 @@
-import copy
-
 import collections
+import copy
+import json
+
 from django import forms
-from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 
 class JSONEditorWidget(forms.Widget):
     template_name = 'django_admin_json_editor/editor.html'
 
-    def __init__(self, schema, collapsed=True, sceditor=False):
-        super(JSONEditorWidget, self).__init__()
+    def __init__(self, schema, collapsed=True, sceditor=False, attrs=None):
+        default_attrs = {'theme': 'bootstrap3', 'iconlib': 'fontawesome4'}
+        if attrs:
+            default_attrs.update(attrs)
+
+        super(JSONEditorWidget, self).__init__(default_attrs)
+
         self._schema = schema
         self._collapsed = collapsed
         self._sceditor = sceditor
@@ -28,7 +34,7 @@ class JSONEditorWidget(forms.Widget):
 
         context = {
             'name': name,
-            'schema': schema,
+            'editor_options': json.dumps(dict(schema=schema, **self.attrs)),
             'data': value,
             'sceditor': int(self._sceditor),
         }
@@ -48,7 +54,6 @@ class JSONEditorWidget(forms.Widget):
     def media(self):
         css = {
             'all': [
-                'django_admin_json_editor/bootstrap/css/bootstrap.min.css',
                 'django_admin_json_editor/fontawesome/css/font-awesome.min.css',
                 'django_admin_json_editor/style.css',
             ]
@@ -58,6 +63,8 @@ class JSONEditorWidget(forms.Widget):
             'django_admin_json_editor/bootstrap/js/bootstrap.min.js',
             'django_admin_json_editor/jsoneditor/jsoneditor.min.js',
         ]
+        if self.attrs.get('theme', '').startswith('bootstrap'):
+            css['all'].append('django_admin_json_editor/bootstrap/css/bootstrap.min.css')
         if self._sceditor:
             css['all'].append('django_admin_json_editor/sceditor/themes/default.min.css')
             js.append('django_admin_json_editor/sceditor/jquery.sceditor.bbcode.min.js')

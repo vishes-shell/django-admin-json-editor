@@ -9,3 +9,15 @@ div.sceditor-container {
     width: 100% !important;
     margin-bottom: 10px;
 }
+
+button.json-editor-btn-add {
+    width: 75px;
+    color: green;
+    left: 25px;
+}
+
+button.json-editor-btn-delete {
+    width: 75px;
+    color: red;
+    left: 75px;
+}
